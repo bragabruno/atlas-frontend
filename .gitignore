@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+tmp/
+out-tsc/
+
+# Angular CLI cache
+.angular/
+
+# Test coverage
+coverage/
+
+# Environment / secrets
+.env
+.env.*
+src/assets/config.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Misc
+*.tgz
+.cache/

@@ -1,0 +1,125 @@
+@startuml module-class
+title atlas-frontend — Key Classes & Relationships
+
+' ─── Models ─────────────────────────────────────────────────────────────────
+package "Shared Models" {
+  class ChatRequest {
+    +model: string
+    +messages: Message[]
+    +stream: boolean
+  }
+
+  class Message {
+    +id: string
+    +role: "user" | "assistant"
+    +content: string
+    +citations: Citation[]
+    +createdAt: Date
+  }
+
+  class Citation {
+    +sourceId: string
+    +title: string
+    +url: string
+    +snippet: string
+  }
+
+  class Usage {
+    +keyId: string
+    +promptTokens: number
+    +completionTokens: number
+    +totalTokens: number
+    +costUsd: number
+    +recordedAt: Date
+  }
+}
+
+' ─── Services ────────────────────────────────────────────────────────────────
+package "Core Services" {
+  class ConfigService {
+    -config: AppConfig
+    +load(): Promise<void>
+    +get gatewayBaseUrl(): string
+  }
+
+  class SseService {
+    +stream(url: string, body: object, headers: HttpHeaders): Observable<string>
+    -parseChunk(raw: string): string | null
+  }
+
+  class GatewayService {
+    -sseService: SseService
+    -configService: ConfigService
+    +chat(request: ChatRequest): Observable<Message>
+    +getUsage(keyId: string): Observable<Usage[]>
+  }
+
+  class AuthInterceptor {
+    -configService: ConfigService
+    +intercept(req, next): Observable<HttpEvent>
+  }
+}
+
+' ─── Components ──────────────────────────────────────────────────────────────
+package "Chat Module" {
+  class ChatPageComponent {
+    -gatewayService: GatewayService
+    +messages: Message[]
+    +streamState: StreamState
+    +submit(text: string): void
+    +selectCitation(c: Citation): void
+  }
+
+  class ComposerComponent {
+    +@Output() send: EventEmitter<string>
+    +disabled: boolean
+    +text: string
+    +onSubmit(): void
+  }
+
+  class MessageListComponent {
+    +@Input() messages: Message[]
+    +@Input() streamState: StreamState
+  }
+
+  class MessageComponent {
+    +@Input() message: Message
+  }
+
+  class CitationsPanelComponent {
+    +@Input() citations: Citation[]
+    +@Output() citationSelected: EventEmitter<Citation>
+  }
+}
+
+package "Usage Module" {
+  class CostDashboardComponent {
+    -gatewayService: GatewayService
+    +usageRows: Usage[]
+    +ngOnInit(): void
+  }
+}
+
+' ─── Relationships ────────────────────────────────────────────────────────────
+GatewayService --> SseService : uses
+GatewayService --> ConfigService : reads baseUrl
+AuthInterceptor --> ConfigService : reads token
+
+ChatPageComponent --> GatewayService : injects
+ChatPageComponent "1" *-- "1" ComposerComponent : contains
+ChatPageComponent "1" *-- "1" MessageListComponent : contains
+ChatPageComponent "1" *-- "1" CitationsPanelComponent : contains
+MessageListComponent "1" *-- "*" MessageComponent : renders
+
+ChatPageComponent ..> Message : owns []
+ChatPageComponent ..> ChatRequest : constructs
+CitationsPanelComponent ..> Citation : displays
+MessageComponent ..> Message : displays
+CostDashboardComponent --> GatewayService : injects
+CostDashboardComponent ..> Usage : displays
+
+GatewayService ..> ChatRequest : accepts
+GatewayService ..> Message : emits
+GatewayService ..> Usage : emits
+
+@enduml
