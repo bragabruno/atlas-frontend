@@ -17,7 +17,7 @@ The SPA is organized into four Angular modules:
 | `UsageModule` | `CostDashboardComponent` |
 | `SharedModule` | Models: `Message`, `Citation`, `Usage`, `ChatRequest` |
 
-State (request/stream lifecycle) is managed via a lightweight service-based store or NgRx. A route guard enforces authentication before any protected view is accessible.
+State (request/stream lifecycle) is managed with an **Angular Signals service-store** (per [ADR-018](../atlas-docs/02-tech-stack-and-adrs.md)); NgRx SignalStore is the sanctioned step-up if shared cross-module state is later needed. A route guard enforces authentication before any protected view is accessible.
 
 ## Gateway integration
 
@@ -62,7 +62,7 @@ The Angular build artifacts contain no secrets. `.env` files are git-ignored.
 npm install
 ng serve            # dev server on http://localhost:4200
 ng build --prod     # production build → dist/
-ng test             # unit tests (Karma/Jest)
+ng test             # unit tests (Vitest — Angular 21 default; Karma is EOL. ADR-018)
 ng lint             # ESLint
 ```
 
