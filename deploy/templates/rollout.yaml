@@ -1,0 +1,118 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "atlas-frontend.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "atlas-frontend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "atlas-frontend.selectorLabels" . | nindent 6 }}
+
+  template:
+    metadata:
+      labels:
+        {{- include "atlas-frontend.selectorLabels" . | nindent 8 }}
+        {{- include "atlas-frontend.labels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "atlas-frontend.serviceAccountName" . }}
+
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        - name: frontend
+          image: "{{ .Values.image.repository }}:{{ required "image.tag must be set (pass --set image.tag=<git-sha>)" .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          volumeMounts:
+            # Mount the runtime config.json into the nginx html root so that
+            # the SPA can fetch /config.json (which nginx serves from this
+            # directory).  Updating the ConfigMap triggers a pod restart via
+            # the Rollout; Argo Rollouts can also be triggered via `kubectl
+            # argo rollouts set image`.
+            - name: runtime-config
+              mountPath: /usr/share/nginx/html/config.json
+              subPath: config.json
+              readOnly: true
+
+      volumes:
+        - name: runtime-config
+          configMap:
+            name: {{ include "atlas-frontend.fullname" . }}-config
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+  strategy:
+    {{- if .Values.canary.enabled }}
+    # ── Canary strategy (production) ──────────────────────────────────────────
+    # Argo Rollouts progressively shifts traffic:
+    #   10% → SLO analysis → 50% → SLO analysis → 100% (promote) or rollback.
+    # autoPromotionEnabled: false means a human (or a passing AnalysisRun) must
+    # explicitly promote; failed analysis triggers automatic rollback.
+    canary:
+      canaryService: {{ include "atlas-frontend.fullname" . }}-canary
+      stableService: {{ include "atlas-frontend.fullname" . }}-stable
+      steps:
+        - setWeight: {{ .Values.canary.initialWeight }}
+        - pause:
+            duration: {{ .Values.canary.pauseDurationSeconds }}s
+        - analysis:
+            templates:
+              - templateName: slo-check
+        - setWeight: 50
+        - pause:
+            duration: {{ .Values.canary.pauseDurationSeconds }}s
+        - analysis:
+            templates:
+              - templateName: slo-check
+      autoPromotionEnabled: false
+    {{- else }}
+    # ── Rolling strategy (dev / canary.enabled=false) ─────────────────────────
+    # maxSurge/maxUnavailable mirrors a standard Deployment rolling update.
+    # Argo Rollouts CRD is still used (for operational consistency across envs)
+    # but no traffic-split or analysis steps are engaged.
+    canary:
+      steps:
+        - setWeight: 100
+      autoPromotionEnabled: true
+    {{- end }}

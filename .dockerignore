@@ -1,0 +1,34 @@
+# Node dependencies — reinstalled inside the build stage
+node_modules/
+
+# Angular build output — built inside the container
+dist/
+
+# Git history and CI metadata
+.git/
+.gitignore
+.gitattributes
+.github/
+.bitbucket/
+
+# Editor and OS artefacts
+.vscode/
+.idea/
+*.sw[po]
+.DS_Store
+Thumbs.db
+
+# Test and dev tooling output
+coverage/
+.angular/cache/
+
+# Docs and diagrams — not needed in the image
+docs/
+*.md
+
+# Deployment chart — not part of the application image
+deploy/
+
+# Environment files — secrets must never enter the image
+.env
+.env.*

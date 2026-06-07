@@ -1,0 +1,122 @@
+# deploy/values.yaml — default values (production baseline).
+# Override per environment with values-dev.yaml / values-prod.yaml.
+# No secrets; runtime config is injected via configMap.
+
+# ─── Image ────────────────────────────────────────────────────────────────────
+image:
+  repository: acr.azurecr.io/atlas/frontend
+  # tag is intentionally empty; set at deploy time with the git SHA:
+  #   helm upgrade --set image.tag=$BITBUCKET_COMMIT
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# ─── Replica count ────────────────────────────────────────────────────────────
+# Ignored when canary.enabled=true — Argo Rollouts owns replica count then.
+replicaCount: 2
+
+# ─── Runtime config ───────────────────────────────────────────────────────────
+# config.json is mounted into the nginx html root so the SPA's ConfigService
+# picks it up at /assets/config.json (the path it fetches at app init).
+# Populate gatewayUrl per environment; bearerToken is optional (BFF path).
+runtimeConfig:
+  gatewayUrl: "https://gateway.atlas.internal"
+  # bearerToken: ""   # do not set a real token here; inject via CI set-value
+
+# ─── Service ──────────────────────────────────────────────────────────────────
+service:
+  type: ClusterIP
+  port: 80
+  # nginx listens on 8080 inside the container (non-root-safe port)
+  targetPort: 8080
+
+# ─── Ingress ──────────────────────────────────────────────────────────────────
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: atlas.internal
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: atlas-frontend-tls
+      hosts:
+        - atlas.internal
+
+# ─── Resources ────────────────────────────────────────────────────────────────
+resources:
+  requests:
+    cpu: "50m"
+    memory: "64Mi"
+  limits:
+    cpu: "200m"
+    memory: "128Mi"
+
+# ─── Probes ───────────────────────────────────────────────────────────────────
+# Both probes hit the lightweight /health endpoint in nginx.conf.
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 3
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+# ─── Canary / Argo Rollouts ───────────────────────────────────────────────────
+canary:
+  # Set true in values-prod.yaml to switch from a plain Rollout to canary steps.
+  # In dev this stays false — the Rollout spec still uses Argo Rollouts but
+  # with a single immediate-promote strategy for fast iteration.
+  enabled: false
+  # Weight (%) of traffic routed to the canary revision before full promotion.
+  initialWeight: 10
+  # Pause durations (seconds) between analysis steps.
+  pauseDurationSeconds: 300
+
+# ─── Service account ──────────────────────────────────────────────────────────
+# frontend has no Key Vault access (static SPA — see atlas-docs/04 §3.2).
+# We still create a dedicated ServiceAccount for audit/RBAC hygiene.
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# ─── Pod annotations ──────────────────────────────────────────────────────────
+podAnnotations:
+  # Signals to the OTel Collector DaemonSet that this pod emits no spans.
+  # Remove if OpenTelemetry RUM instrumentation is added later.
+  instrumentation.opentelemetry.io/inject-nodejs: "false"
+
+# ─── Security context ─────────────────────────────────────────────────────────
+podSecurityContext:
+  runAsNonRoot: false   # nginx master process must bind port; see note below
+  # Note: nginx:alpine runs the master as root and worker processes as `nginx`
+  # (uid 101). AKS policy allows this for port-binding purposes; the worker
+  # processes drop to uid 101.  If a distroless or rootless nginx image is
+  # adopted later, set runAsNonRoot: true and runAsUser: 101.
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false   # nginx writes tmp files; set true only with tmpfs mounts
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
+# ─── Node selector / tolerations / affinity ───────────────────────────────────
+nodeSelector: {}
+tolerations: []
+affinity: {}

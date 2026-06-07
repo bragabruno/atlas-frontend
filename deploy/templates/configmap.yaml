@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "atlas-frontend.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "atlas-frontend.labels" . | nindent 4 }}
+data:
+  # config.json is volume-mounted into /usr/share/nginx/html/ at runtime.
+  # The SPA's ConfigService fetches it from /assets/config.json (browser-relative
+  # path that resolves to the nginx root, not a sub-directory).
+  # No secrets are stored here; bearerToken is optional and only for dev/demo
+  # scenarios where a BFF is not fronting the gateway.
+  config.json: |
+    {{ .Values.runtimeConfig | toJson }}
