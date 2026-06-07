@@ -6,6 +6,11 @@ import { firstValueFrom } from 'rxjs';
 export interface RuntimeConfig {
   /** Base URL of the atlas-gateway (e.g. https://gateway.internal). */
   gatewayUrl: string;
+  /**
+   * Bearer token used to authenticate requests to the gateway.
+   * Sourced from a secured runtime config endpoint or BFF — never hardcoded.
+   */
+  bearerToken?: string;
 }
 
 /**
