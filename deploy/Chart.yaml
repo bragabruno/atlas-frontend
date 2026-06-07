@@ -1,0 +1,20 @@
+apiVersion: v2
+name: atlas-frontend
+description: Atlas RegDoc Q&A SPA — nginx static serve on AKS with Argo Rollouts canary.
+type: application
+
+# Chart version — bump on every chart change (semver).
+version: 0.1.0
+
+# Application version — the Angular SPA version; independent of chart version.
+appVersion: "0.1.0"
+
+# Argo Rollouts is a cluster-level operator; no chart dependency needed here.
+# The Rollout CRD (argoproj.io/v1alpha1) must be installed by atlas-infra
+# before this chart is deployed.
+keywords:
+  - atlas
+  - frontend
+  - nginx
+  - spa
+  - angular

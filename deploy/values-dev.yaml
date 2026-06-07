@@ -1,0 +1,34 @@
+# deploy/values-dev.yaml — dev environment overrides.
+# Applied on top of values.yaml:
+#   helm upgrade --install atlas-frontend deploy/ \
+#     --namespace atlas-dev \
+#     --values deploy/values-dev.yaml \
+#     --set image.tag=$BITBUCKET_COMMIT
+
+replicaCount: 1
+
+runtimeConfig:
+  gatewayUrl: "http://atlas-gateway.atlas-dev.svc.cluster.local:8080"
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: atlas-dev.internal
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []   # no TLS in dev
+
+resources:
+  requests:
+    cpu: "25m"
+    memory: "32Mi"
+  limits:
+    cpu: "100m"
+    memory: "64Mi"
+
+# Dev: canary disabled — single revision, immediate promote.
+canary:
+  enabled: false
