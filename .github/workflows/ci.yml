@@ -1,0 +1,110 @@
+# GitHub Actions CI — atlas-frontend (INF-2 Gate 1, XCUT-6).
+#
+# Mirrors bitbucket-pipelines.yml: orchestration-only — every gate calls a
+# versioned script under scripts/ (the single source of truth). Logic lives in
+# scripts/, not here. bitbucket-pipelines.yml is kept as the Enhesa-mirror
+# reference; this file is the executable gate for github.com/bragabruno/atlas-frontend.
+# Run `make ci` locally for the same gates plus the docker/infra stages (which
+# need helm + a docker daemon not present here). See atlas-docs/07-build-system.md.
+#
+# Gate 1 (scripts/lint.sh): Trunk(eslint + prettier) + tsc --noEmit, using the
+#   repo's pinned configs (eslint.config.js, .prettierrc).
+# Gate 1 (scripts/test.sh): vitest run-once (ng test --watch=false; zero spend).
+# XCUT-6  (scripts/validate_diagrams.sh): Mermaid + PlantUML diagram validation.
+#
+# Lockfile (package-lock.json) is committed (XCUT-4); `npm ci` installs from it
+# exactly. Node is pinned to the toolchain major (22) via setup-node.
+#
+# All third-party actions are pinned to a commit SHA (supply-chain rule: no
+# floating refs; every pin verified >14 days old). The trailing comment records
+# the human-readable tag and release date each SHA corresponds to.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Gate 1 — Lint & Typecheck (scripts/lint.sh)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 (2026-01-09)
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0 (2026-04-20)
+        with:
+          node-version: 22.22.2
+          cache: npm
+      - name: Install dependencies (npm ci)
+        run: npm ci
+      # Trunk fetches its tools at runtime; cache them keyed on the pinned config.
+      - name: Cache Trunk
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5 (2026-04-13)
+        with:
+          path: ~/.cache/trunk
+          key: trunk-${{ runner.os }}-${{ hashFiles('.trunk/trunk.yaml') }}
+      - name: Install Trunk
+        run: curl -fsSL https://get.trunk.io | bash -s -- -y
+      # CI=true is set by GitHub, so scripts/lint.sh runs `trunk check --all --ci`.
+      - name: Lint & typecheck
+        run: |
+          export PATH="$HOME/.cache/trunk/bin:$PATH"
+          ./scripts/lint.sh
+
+  test:
+    name: Gate 1 — Unit Tests (scripts/test.sh)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 (2026-01-09)
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0 (2026-04-20)
+        with:
+          node-version: 22.22.2
+          cache: npm
+      - name: Install dependencies (npm ci)
+        run: npm ci
+      # Vitest run-once (ng test --watch=false), zero API spend. CHROME_BIN is set
+      # defensively to mirror the bitbucket step; vitest runs headless in node.
+      - name: Unit tests
+        run: CHROME_BIN=/usr/bin/chromium ./scripts/test.sh
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0 (2025-10-15)
+        with:
+          name: coverage
+          path: coverage/**
+          if-no-files-found: ignore
+
+  diagrams:
+    name: XCUT-6 — Diagram validation (scripts/validate_diagrams.sh)
+    runs-on: ubuntu-latest
+    env:
+      # mermaid-cli (11.14.0) runs headless via the system Chromium. On Ubuntu the
+      # apt 'chromium' package installs the real binary at /usr/bin/chromium
+      # (matches the bitbucket node-image step); 'chromium-browser' is a snap stub
+      # that fails headless in CI, so it is deliberately NOT used here.
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 (2026-01-09)
+      - name: Install JRE + Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            default-jre-headless chromium fonts-liberation
+      - name: Fetch pinned PlantUML jar
+        # Pinned PlantUML jar (1.2026.3, 2026-05-08) from the GitHub release.
+        env:
+          PLANTUML_VERSION: 1.2026.3
+        run: |
+          curl -fsSL -o /tmp/plantuml.jar \
+            "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar"
+      - name: Validate diagrams
+        env:
+          PLANTUML_JAR: /tmp/plantuml.jar
+        run: |
+          printf '{"args":["--no-sandbox"]}' > /tmp/puppeteer.json
+          export PUPPETEER_CONFIG=/tmp/puppeteer.json
+          ./scripts/validate_diagrams.sh docs/diagrams
