@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { CitationsPanelComponent } from './citations-panel.component';
+import { CitationsPanelComponent } from './citations-panel';
 import type { Citation } from '../../../shared/models';
 
 function makeCitation(overrides: Partial<Citation> = {}): Citation {

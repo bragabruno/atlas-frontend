@@ -3,9 +3,9 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 
-import { ConfigService, RuntimeConfig } from './config.service';
-import { GatewayService } from './gateway.service';
-import type { ChatCompletionRequest, ChatCompletionResponse } from './gateway.service';
+import { ConfigService, RuntimeConfig } from './config';
+import { GatewayService } from './gateway';
+import type { ChatCompletionRequest, ChatCompletionResponse } from './gateway';
 
 const GATEWAY_URL = 'http://test-gateway:8080';
 

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { MessageListComponent } from './message-list.component';
+import { MessageListComponent } from './message-list';
 import type { Message } from '../../../shared/models';
 
 function makeMsg(id: string, role: 'user' | 'assistant', content: string): Message {

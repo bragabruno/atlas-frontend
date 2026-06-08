@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ConfigService } from './config.service';
+import { ConfigService } from './config';
 import type { components } from '../api/gateway-types';
 import type { ChatCompletionResponse, ChatCompletionChunk } from '../api/gateway-openai-types';
 

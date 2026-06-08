@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 
-import { ChatStateStore } from '../../store/chat-state.store';
-import { MessageListComponent } from '../../components/message-list/message-list.component';
-import { ComposerComponent } from '../../components/composer/composer.component';
-import { CitationsPanelComponent } from '../../components/citations-panel/citations-panel.component';
+import { ChatStateStore } from '../../store/chat-state-store';
+import { MessageListComponent } from '../../components/message-list/message-list';
+import { ComposerComponent } from '../../components/composer/composer';
+import { CitationsPanelComponent } from '../../components/citations-panel/citations-panel';
 
 /** Default model sent to the gateway. Can be made configurable later. */
 const DEFAULT_MODEL = 'atlas-rag';

@@ -2,9 +2,9 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import { SseService, TooManyRequestsError } from '../../core/services/sse.service';
-import type { StreamState } from '../../core/services/sse.service';
-import { ChatStateStore } from './chat-state.store';
+import { SseService, TooManyRequestsError } from '../../core/services/sse';
+import type { StreamState } from '../../core/services/sse';
+import { ChatStateStore } from './chat-state-store';
 
 // ---------------------------------------------------------------------------
 // Helpers

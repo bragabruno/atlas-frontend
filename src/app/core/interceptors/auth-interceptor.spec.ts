@@ -3,8 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors, HttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 
-import { ConfigService, RuntimeConfig } from '../services/config.service';
-import { authInterceptor } from './auth.interceptor';
+import { ConfigService, RuntimeConfig } from '../services/config';
+import { authInterceptor } from './auth-interceptor';
 
 /** Build a minimal ConfigService stub with a preset RuntimeConfig. */
 function makeConfigStub(cfg: RuntimeConfig | null): Pick<ConfigService, 'config'> {
