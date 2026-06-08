@@ -81,9 +81,7 @@ export class ChatStateStore {
   readonly isSubmitting = computed(() => this._state().status === 'submitting');
   readonly isStreaming = computed(() => this._state().status === 'streaming');
   readonly isBusy = computed(
-    () =>
-      this._state().status === 'submitting' ||
-      this._state().status === 'streaming',
+    () => this._state().status === 'submitting' || this._state().status === 'streaming',
   );
   readonly error = computed(() => this._state().error);
   readonly retryAfter = computed(() => this._state().retryAfter);

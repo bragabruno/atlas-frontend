@@ -1,0 +1,36 @@
+# This file controls the behavior of Trunk: https://docs.trunk.io/cli
+# To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
+version: 0.1
+cli:
+  version: 1.25.0
+# Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
+plugins:
+  sources:
+    - id: trunk
+      ref: v1.10.2
+      uri: https://github.com/trunk-io/plugins
+# Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
+runtimes:
+  enabled:
+    - node@22.22.2
+# This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
+# eslint + prettier use the repo's existing configs (eslint.config.js, .prettierrc).
+lint:
+  enabled:
+    - eslint@9.28.0
+    - prettier@3.8.3
+  # Trunk does not read .prettierignore natively; mirror it here so prettier skips
+  # Helm Go-templated YAML (SyntaxError) and codegen output. Keep in sync with .prettierignore.
+  ignore:
+    - linters: [prettier]
+      paths:
+        - deploy/templates/**
+        - '**/openapi.json'
+        - src/**/gateway-types.ts
+actions:
+  disabled:
+    - trunk-announce
+    - trunk-check-pre-push
+    - trunk-fmt-pre-commit
+  enabled:
+    - trunk-upgrade-available

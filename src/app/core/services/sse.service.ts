@@ -1,15 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 
 import { ConfigService } from './config.service';
-import type {
-  ChatCompletionChunk,
-  ChatCompletionResponse,
-} from '../api/gateway-openai-types';
+import type { ChatCompletionChunk, ChatCompletionResponse } from '../api/gateway-openai-types';
 import type { components } from '../api/gateway-types';
 
 /** Request type derived from the gateway OpenAPI spec. */
-export type ChatCompletionRequest =
-  components['schemas']['ChatCompletionRequest'];
+export type ChatCompletionRequest = components['schemas']['ChatCompletionRequest'];
 
 /** Error thrown when the gateway returns HTTP 429 Too Many Requests. */
 export class TooManyRequestsError extends Error {
@@ -100,8 +96,7 @@ export class SseService {
 
     if (response.status === 429) {
       const retryAfterRaw = response.headers.get('Retry-After');
-      const retryAfter =
-        retryAfterRaw !== null ? parseInt(retryAfterRaw, 10) : null;
+      const retryAfter = retryAfterRaw !== null ? parseInt(retryAfterRaw, 10) : null;
       const error = new TooManyRequestsError(
         retryAfter !== null && !isNaN(retryAfter) ? retryAfter : null,
       );
@@ -110,9 +105,7 @@ export class SseService {
     }
 
     if (!response.ok) {
-      const error = new Error(
-        `Gateway error ${response.status}: ${response.statusText}`,
-      );
+      const error = new Error(`Gateway error ${response.status}: ${response.statusText}`);
       this._state.update((s) => ({ ...s, streaming: false, error }));
       throw error;
     }

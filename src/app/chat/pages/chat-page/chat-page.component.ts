@@ -55,10 +55,7 @@ const DEFAULT_MODEL = 'atlas-rag';
         }
         <!-- ---------------------------------------------------------------- -->
 
-        <atlas-composer
-          [disabled]="store.isBusy()"
-          (submitted)="onSubmit($event)"
-        />
+        <atlas-composer [disabled]="store.isBusy()" (submitted)="onSubmit($event)" />
       </main>
 
       <atlas-citations-panel [citations]="citations" />

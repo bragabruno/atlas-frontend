@@ -1,0 +1,13 @@
+# Helm Go-templated YAML — prettier throws SyntaxError parsing the {{ ... }} delimiters
+deploy/templates/
+
+# Generated artifacts (codegen output / its input) — do not reformat
+# gateway-types.ts is emitted by `npm run gen:api` (openapi-typescript); openapi.json is its source spec.
+openapi.json
+src/**/gateway-types.ts
+
+# Standard build / tooling output
+node_modules/
+dist/
+coverage/
+.angular/

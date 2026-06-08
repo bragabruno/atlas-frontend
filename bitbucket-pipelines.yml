@@ -1,26 +1,43 @@
 # Bitbucket Pipelines — atlas-frontend (INF-2 Gate 1, XCUT-6).
 #
-# Gate 1 (Correctness): npm ci -> eslint -> tsc --noEmit -> vitest (run-once).
-# XCUT-6: validate_diagrams.sh validates Mermaid + PlantUML diagrams.
+# Gate 1 (Correctness): Trunk (eslint + prettier) -> tsc --noEmit -> vitest (run-once).
+# Lint/format is fronted by Trunk (trunk check --all --ci); eslint + prettier use
+# the repo's existing configs. XCUT-6: validate_diagrams.sh validates Mermaid + PlantUML.
 #
 # Lockfile (package-lock.json) is already committed (XCUT-4); `npm ci` installs
 # from it exactly. Image pinned to the toolchain's Node major (Node 22). No
 # secret values in this file.
 
-image: node:22.22.2-bookworm-slim  # 22.22.2 (2026-03-24)
+image: node:22.22.2-bookworm-slim # 22.22.2 (2026-03-24)
 
 definitions:
   caches:
     npm-cache: ~/.npm
+    trunk-cache: ~/.cache/trunk
 
   steps:
-    - step: &lint-typecheck-test
-        name: "Gate 1 — Lint, Typecheck & Unit Tests"
+    - step: &trunk-check
+        name: 'Gate 1 — Lint & Format (Trunk)'
+        caches: [npm-cache, trunk-cache]
+        script:
+          # Trunk runs eslint + prettier from the repo's pinned configs.
+          - apt-get update && apt-get install -y git curl ca-certificates
+          - curl -fsSL https://get.trunk.io | bash -s -- -y
+          - export PATH="$HOME/.cache/trunk/bin:$PATH"
+          - trunk check --all --ci
+
+    - step: &typecheck
+        name: 'Gate 1 — Typecheck (tsc --noEmit)'
         caches: [npm-cache]
         script:
           - npm ci
-          - npm run lint
           - npm run typecheck
+
+    - step: &unit-tests
+        name: 'Gate 1 — Unit Tests (vitest)'
+        caches: [npm-cache]
+        script:
+          - npm ci
           # Vitest run-once (ng test --watch=false), zero API spend.
           - CHROME_BIN=/usr/bin/chromium npm test
         # The Angular/Vitest unit-test builder runs headless; Chromium deps below.
@@ -28,13 +45,13 @@ definitions:
           - coverage/**
 
     - step: &diagram-validation
-        name: "XCUT-6 — Diagram validation"
+        name: 'XCUT-6 — Diagram validation'
         script:
           - apt-get update && apt-get install -y --no-install-recommends
-              default-jre-headless chromium fonts-liberation
+            default-jre-headless chromium fonts-liberation
           - export PLANTUML_VERSION=1.2026.3
           - curl -fsSL -o /tmp/plantuml.jar
-              "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar"
+            "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar"
           - export PLANTUML_JAR=/tmp/plantuml.jar
           - export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
           - printf '{"args":["--no-sandbox"]}' > /tmp/puppeteer.json
@@ -43,7 +60,9 @@ definitions:
 
 pipelines:
   pull-requests:
-    "**":
+    '**':
       - parallel:
-          - step: *lint-typecheck-test
+          - step: *trunk-check
+          - step: *typecheck
+          - step: *unit-tests
           - step: *diagram-validation
