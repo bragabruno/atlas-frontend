@@ -1,9 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  provideHttpClientTesting,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 
 import { ConfigService, RuntimeConfig } from './config.service';
 
@@ -13,11 +10,7 @@ describe('ConfigService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        ConfigService,
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), ConfigService],
     });
     service = TestBed.inject(ConfigService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -53,9 +46,7 @@ describe('ConfigService', () => {
   });
 
   it('gatewayUrl throws before load() completes', () => {
-    expect(() => service.gatewayUrl).toThrowError(
-      'ConfigService.load() has not completed yet.',
-    );
+    expect(() => service.gatewayUrl).toThrowError('ConfigService.load() has not completed yet.');
   });
 
   it('loads optional bearerToken without hardcoding it', async () => {
@@ -77,7 +68,7 @@ describe('ConfigService', () => {
     // This is a canary: if any key/token string is accidentally baked in,
     // the test fails. Actual secrets should only arrive via config.json at runtime.
     const hardcodedPatterns = [
-      /sk-[A-Za-z0-9]{20,}/,   // OpenAI-style key
+      /sk-[A-Za-z0-9]{20,}/, // OpenAI-style key
       /Bearer\s+[A-Za-z0-9._-]{20,}/, // hardcoded bearer token
       /api[_-]?key\s*[:=]\s*['"][A-Za-z0-9._-]{8,}/i,
     ];

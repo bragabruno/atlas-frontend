@@ -199,9 +199,7 @@ describe('SseService', () => {
     });
 
     const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
-    expect((init.headers as Record<string, string>)['Authorization']).toBe(
-      'Bearer bearer-test',
-    );
+    expect((init.headers as Record<string, string>)['Authorization']).toBe('Bearer bearer-test');
   });
 
   it('forces stream: true in the request body', async () => {

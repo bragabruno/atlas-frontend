@@ -10,10 +10,12 @@ import { ChatStateStore } from './chat-state.store';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeSseStub(overrides: Partial<{
-  streamFn: (body: unknown) => Promise<void>;
-  initialContent: string;
-}> = {}): {
+function makeSseStub(
+  overrides: Partial<{
+    streamFn: (body: unknown) => Promise<void>;
+    initialContent: string;
+  }> = {},
+): {
   service: Pick<SseService, 'state' | 'stream' | 'reset'>;
   stateSignal: ReturnType<typeof signal<StreamState>>;
 } {
@@ -33,14 +35,9 @@ function makeSseStub(overrides: Partial<{
   return { service, stateSignal };
 }
 
-function provideStore(
-  sseSvc: Pick<SseService, 'state' | 'stream' | 'reset'>,
-): ChatStateStore {
+function provideStore(sseSvc: Pick<SseService, 'state' | 'stream' | 'reset'>): ChatStateStore {
   TestBed.configureTestingModule({
-    providers: [
-      ChatStateStore,
-      { provide: SseService, useValue: sseSvc },
-    ],
+    providers: [ChatStateStore, { provide: SseService, useValue: sseSvc }],
   });
   return TestBed.inject(ChatStateStore);
 }

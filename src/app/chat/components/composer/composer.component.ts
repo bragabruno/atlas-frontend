@@ -27,7 +27,7 @@ import { FormsModule } from '@angular/forms';
       <button
         type="submit"
         class="composer__submit"
-        [attr.disabled]="(disabled() || !text().trim()) ? true : null"
+        [attr.disabled]="disabled() || !text().trim() ? true : null"
         aria-label="Send question"
       >
         @if (disabled()) {
@@ -106,7 +106,9 @@ import { FormsModule } from '@angular/forms';
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
   `,
 })

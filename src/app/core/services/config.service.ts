@@ -27,9 +27,7 @@ export class ConfigService {
 
   /** Call once via APP_INITIALIZER to load config before the app renders. */
   async load(): Promise<void> {
-    const cfg = await firstValueFrom(
-      this.http.get<RuntimeConfig>('/assets/config.json'),
-    );
+    const cfg = await firstValueFrom(this.http.get<RuntimeConfig>('/assets/config.json'));
     this._config.set(cfg);
   }
 

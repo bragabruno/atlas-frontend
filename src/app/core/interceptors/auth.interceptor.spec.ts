@@ -1,14 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import {
-  provideHttpClient,
-  withInterceptors,
-  HttpClient,
-} from '@angular/common/http';
-import {
-  provideHttpClientTesting,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptors, HttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 
 import { ConfigService, RuntimeConfig } from '../services/config.service';
 import { authInterceptor } from './auth.interceptor';
@@ -50,9 +43,7 @@ describe('authInterceptor', () => {
     http.get('http://gateway:8080/v1/chat/completions').subscribe();
 
     const req = httpMock.expectOne('http://gateway:8080/v1/chat/completions');
-    expect(req.request.headers.get('Authorization')).toBe(
-      'Bearer test-token-xyz',
-    );
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token-xyz');
     req.flush({});
   });
 
