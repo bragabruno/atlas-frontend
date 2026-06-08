@@ -1,0 +1,33 @@
+# Pre-commit hooks for atlas-frontend (INF-1).
+# Hook revs are pinned to releases >=14 days old per atlas-docs/02 §2.
+# The prettier mirror rev matches the pinned prettier in package.json (3.8.3).
+minimum_pre_commit_version: "3.5.0"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0  # 2025-08-09
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.8.3  # 2026-04-15; matches package.json prettier 3.8.3
+    hooks:
+      - id: prettier
+        files: \.(ts|html|scss|css|json|md|ya?ml)$
+
+  # ESLint via the repo's own pinned toolchain (eslint 9.28.0 + typescript-eslint).
+  # Local hook so the exact package.json devDependency versions are used — no
+  # second, drift-prone pin of eslint in pre-commit.
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: npm run lint --
+        language: system
+        pass_filenames: false
+        files: \.(ts|html)$
