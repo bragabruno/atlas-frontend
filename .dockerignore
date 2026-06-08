@@ -26,8 +26,13 @@ coverage/
 docs/
 *.md
 
-# Deployment chart — not part of the application image
-deploy/
+# Deployment chart — not part of the application image.
+# Exception: the Dockerfile copies deploy/nginx/nginx.conf into the runtime
+# stage, so that one file must remain in the build context.
+deploy/*
+!deploy/nginx
+deploy/nginx/*
+!deploy/nginx/nginx.conf
 
 # Environment files — secrets must never enter the image
 .env
