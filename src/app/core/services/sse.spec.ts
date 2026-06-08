@@ -2,8 +2,8 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import { ConfigService, RuntimeConfig } from './config.service';
-import { SseService, TooManyRequestsError } from './sse.service';
+import { ConfigService, RuntimeConfig } from './config';
+import { SseService, TooManyRequestsError } from './sse';
 import type { ChatCompletionChunk } from '../api/gateway-openai-types';
 
 const GATEWAY_URL = 'http://test-gateway:8080';

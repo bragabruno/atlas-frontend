@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 
-import { SseService, TooManyRequestsError } from '../../core/services/sse.service';
-import type { ChatCompletionRequest } from '../../core/services/sse.service';
+import { SseService, TooManyRequestsError } from '../../core/services/sse';
+import type { ChatCompletionRequest } from '../../core/services/sse';
 import type { Message } from '../../shared/models';
 
 // ---------------------------------------------------------------------------

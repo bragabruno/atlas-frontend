@@ -1,7 +1,7 @@
 import { Component, input, afterNextRender, ElementRef, viewChild } from '@angular/core';
 
 import type { Message } from '../../../shared/models';
-import { MessageComponent } from '../message/message.component';
+import { MessageComponent } from '../message/message';
 
 /**
  * MessageListComponent — scrollable list of completed conversation messages.

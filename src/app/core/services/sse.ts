@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 
-import { ConfigService } from './config.service';
+import { ConfigService } from './config';
 import type { ChatCompletionChunk, ChatCompletionResponse } from '../api/gateway-openai-types';
 import type { components } from '../api/gateway-types';
 

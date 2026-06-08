@@ -3,9 +3,9 @@ import { By } from '@angular/platform-browser';
 import { signal } from '@angular/core';
 import { vi } from 'vitest';
 
-import { ChatPageComponent } from './chat-page.component';
-import { ChatStateStore } from '../../store/chat-state.store';
-import type { ChatStatus } from '../../store/chat-state.store';
+import { ChatPageComponent } from './chat-page';
+import { ChatStateStore } from '../../store/chat-state-store';
+import type { ChatStatus } from '../../store/chat-state-store';
 
 // ---------------------------------------------------------------------------
 // Stub factory
