@@ -47,3 +47,6 @@ Thumbs.db
 .env
 .env.*
 src/assets/config.json
+
+# Trunk (machine-local linter cache — symlinks into ~/.cache/trunk)
+.trunk/
