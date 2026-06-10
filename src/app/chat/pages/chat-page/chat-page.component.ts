@@ -61,7 +61,7 @@ const DEFAULT_MODEL = 'atlas-rag';
         />
       </main>
 
-      <atlas-citations-panel [citations]="citations" />
+      <atlas-citations-panel [citations]="store.citations()" />
     </div>
   `,
   styles: `
@@ -111,12 +111,6 @@ const DEFAULT_MODEL = 'atlas-rag';
 })
 export class ChatPageComponent {
   protected readonly store = inject(ChatStateStore);
-
-  /**
-   * Citations list — placeholder for the source_ids wire-up that comes in a
-   * later ticket (CitationsPanel is rendered but empty until then).
-   */
-  protected readonly citations = [];
 
   protected onSubmit(question: string): void {
     void this.store.submit(question, DEFAULT_MODEL);

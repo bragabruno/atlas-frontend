@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { SseService, TooManyRequestsError } from '../../core/services/sse.service';
 import type { ChatCompletionRequest } from '../../core/services/sse.service';
+import type { Citation } from '../../shared/models/citation.model';
 import type { Message } from '../../shared/models';
 
 // ---------------------------------------------------------------------------
@@ -41,6 +42,8 @@ export interface ChatState {
    * 'rate_limited' state.
    */
   retryAfter: number | null;
+  /** Source citations parsed from the last completed assistant turn. */
+  citations: Citation[];
 }
 
 // ---------------------------------------------------------------------------
@@ -53,7 +56,22 @@ const initialState = (): ChatState => ({
   streamingContent: '',
   error: null,
   retryAfter: null,
+  citations: [],
 });
+
+/** Parse `[src:some-id]` markers from assistant content into Citation objects. */
+export function parseCitations(content: string): Citation[] {
+  const seen = new Set<string>();
+  const result: Citation[] = [];
+  for (const match of content.matchAll(/\[src:([^\]]+)\]/g)) {
+    const sourceId = match[1];
+    if (!seen.has(sourceId)) {
+      seen.add(sourceId);
+      result.push({ sourceId, title: sourceId });
+    }
+  }
+  return result;
+}
 
 /**
  * ChatStateStore — Signals-based store for the request/stream lifecycle.
@@ -87,6 +105,7 @@ export class ChatStateStore {
   );
   readonly error = computed(() => this._state().error);
   readonly retryAfter = computed(() => this._state().retryAfter);
+  readonly citations = computed(() => this._state().citations);
 
   // ---------------------------------------------------------------------------
   // Public API
@@ -161,13 +180,13 @@ export class ChatStateStore {
         status: 'done',
         streamingContent: '',
         messages: [...s.messages, assistantMessage],
+        citations: parseCitations(finalContent),
       }));
     } catch (err) {
       this._handleStreamError(err);
     }
   }
 
-  /** Reset back to idle (user dismisses banner or starts a new session). */
   reset(): void {
     this.sse.reset();
     this._state.set(initialState());

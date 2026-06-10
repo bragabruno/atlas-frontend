@@ -34,6 +34,7 @@ function makeStoreStub(overrides: StubOverrides = {}): Partial<ChatStateStore> {
     isSubmitting: signal(false).asReadonly(),
     error: signal<Error | null>(err).asReadonly(),
     retryAfter: signal<number | null>(retryAfter).asReadonly(),
+    citations: signal([]).asReadonly(),
     submit: vi.fn(() => Promise.resolve()),
     dismiss: vi.fn(),
     reset: vi.fn(),

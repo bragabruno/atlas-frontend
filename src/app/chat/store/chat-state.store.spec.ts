@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
 import { SseService, TooManyRequestsError } from '../../core/services/sse.service';
+import { parseCitations } from './chat-state.store';
 import type { StreamState } from '../../core/services/sse.service';
 import { ChatStateStore } from './chat-state.store';
 
@@ -48,6 +49,27 @@ function provideStore(
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
+
+describe('parseCitations', () => {
+  it('returns empty array when no markers present', () => {
+    expect(parseCitations('No citations here.')).toEqual([]);
+  });
+
+  it('extracts a single marker', () => {
+    expect(parseCitations('See [src:doc-42].')).toEqual([
+      { sourceId: 'doc-42', title: 'doc-42' },
+    ]);
+  });
+
+  it('extracts multiple distinct markers preserving order', () => {
+    const result = parseCitations('[src:a] then [src:b] then [src:c]');
+    expect(result.map((c) => c.sourceId)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('deduplicates repeated markers', () => {
+    expect(parseCitations('[src:x] [src:x] [src:x]')).toHaveLength(1);
+  });
+});
 
 describe('ChatStateStore', () => {
   afterEach(() => {
@@ -234,6 +256,71 @@ describe('ChatStateStore', () => {
     await store.submit('q', 'atlas-rag');
     // done
     expect(store.isBusy()).toBe(false);
+  });
+
+  // ── citations parsed from final content ──────────────────────────────────
+
+  it('citations are empty before first submission', () => {
+    const { service } = makeSseStub();
+    const store = provideStore(service);
+    expect(store.citations()).toEqual([]);
+  });
+
+  it('populates citations from [src:xxx] markers in assistant reply', async () => {
+    const { service, stateSignal } = makeSseStub({
+      streamFn: async () => {
+        stateSignal.update((s) => ({
+          ...s,
+          done: true,
+          content: 'See [src:reg-001] and [src:reg-002] for details.',
+        }));
+      },
+    });
+    const store = provideStore(service);
+
+    await store.submit('q', 'atlas-rag');
+
+    expect(store.citations()).toEqual([
+      { sourceId: 'reg-001', title: 'reg-001' },
+      { sourceId: 'reg-002', title: 'reg-002' },
+    ]);
+  });
+
+  it('deduplicates repeated source ids in citations', async () => {
+    const { service, stateSignal } = makeSseStub({
+      streamFn: async () => {
+        stateSignal.update((s) => ({
+          ...s,
+          done: true,
+          content: '[src:reg-001] is mentioned twice. See [src:reg-001] again.',
+        }));
+      },
+    });
+    const store = provideStore(service);
+
+    await store.submit('q', 'atlas-rag');
+
+    expect(store.citations()).toHaveLength(1);
+    expect(store.citations()[0].sourceId).toBe('reg-001');
+  });
+
+  it('citations are cleared on reset', async () => {
+    const { service, stateSignal } = makeSseStub({
+      streamFn: async () => {
+        stateSignal.update((s) => ({
+          ...s,
+          done: true,
+          content: 'See [src:reg-001].',
+        }));
+      },
+    });
+    const store = provideStore(service);
+
+    await store.submit('q', 'atlas-rag');
+    expect(store.citations()).toHaveLength(1);
+
+    store.reset();
+    expect(store.citations()).toEqual([]);
   });
 
   // ── message ids are unique UUIDs ──────────────────────────────────────────

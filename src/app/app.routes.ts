@@ -8,5 +8,12 @@ export const routes: Routes = [
         (m) => m.ChatPageComponent,
       ),
   },
+  {
+    path: 'usage',
+    loadComponent: () =>
+      import('./usage/components/cost-dashboard/cost-dashboard.component').then(
+        (m) => m.CostDashboardComponent,
+      ),
+  },
   { path: '', redirectTo: 'chat', pathMatch: 'full' },
 ];
