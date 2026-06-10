@@ -26,8 +26,11 @@ coverage/
 docs/
 *.md
 
-# Deployment chart — not part of the application image
-deploy/
+# Deployment Helm chart — not part of the application image.
+# Exclude the chart files but KEEP deploy/nginx/ — the runtime stage copies
+# deploy/nginx/nginx.conf into the image (excluding all of deploy/ broke the build).
+deploy/*
+!deploy/nginx
 
 # Environment files — secrets must never enter the image
 .env

@@ -38,8 +38,10 @@ COPY --from=build /app/dist/atlas-frontend/browser /usr/share/nginx/html
 EXPOSE 8080
 
 # Healthcheck — liveness probe uses this in local docker run scenarios
-# (AKS uses the Rollout probe spec; this is belt-and-suspenders for local use)
+# (AKS uses the Rollout probe spec; this is belt-and-suspenders for local use).
+# Use 127.0.0.1, not localhost: busybox resolves localhost to IPv6 ::1, but
+# nginx `listen 8080` binds IPv4 only, so `localhost` would be refused.
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
-    CMD wget -q -O /dev/null http://localhost:8080/health || exit 1
+    CMD wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,41 @@
+# deploy/values-prod.yaml — prod environment overrides.
+# Full scale; Argo Rollouts canary on. Applied on top of values.yaml:
+#   helm upgrade --install atlas-frontend deploy/ \
+#     --namespace atlas-platform \
+#     --values deploy/values-prod.yaml \
+#     --set image.tag=$BITBUCKET_COMMIT
+
+replicaCount: 3
+
+image:
+  pullPolicy: IfNotPresent
+
+runtimeConfig:
+  gatewayUrl: "http://atlas-gateway.atlas-platform.svc.cluster.local:8080"
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: atlas.internal
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: atlas-frontend-tls
+      hosts:
+        - atlas.internal
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "2000m"
+    memory: "2Gi"
+
+# Argo Rollouts canary (replaces the Deployment) — steps/analysis come from the
+# chart defaults (10% → SLO check → full promotion), no auto-promotion.
+canary:
+  enabled: true

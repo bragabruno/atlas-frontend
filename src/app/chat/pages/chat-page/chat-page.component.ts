@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 
+import { ConfigService } from '../../../core/services/config.service';
 import { ChatStateStore } from '../../store/chat-state.store';
 import { MessageListComponent } from '../../components/message-list/message-list.component';
 import { ComposerComponent } from '../../components/composer/composer.component';
 import { CitationsPanelComponent } from '../../components/citations-panel/citations-panel.component';
 
-/** Default model sent to the gateway. Can be made configurable later. */
-const DEFAULT_MODEL = 'atlas-rag';
+/** Fallback model when runtime config does not specify `defaultModel`. */
+const FALLBACK_MODEL = 'atlas-rag';
 
 /**
  * ChatPageComponent — primary view for the RegDoc Q&A interface.
@@ -111,8 +112,10 @@ const DEFAULT_MODEL = 'atlas-rag';
 })
 export class ChatPageComponent {
   protected readonly store = inject(ChatStateStore);
+  private readonly config = inject(ConfigService);
 
   protected onSubmit(question: string): void {
-    void this.store.submit(question, DEFAULT_MODEL);
+    const model = this.config.config()?.defaultModel ?? FALLBACK_MODEL;
+    void this.store.submit(question, model);
   }
 }

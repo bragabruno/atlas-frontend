@@ -1,0 +1,41 @@
+# deploy/values-stage.yaml — stage (pre-prod) environment overrides.
+# Prod-like topology at reduced scale, for validation before prod.
+# Applied on top of values.yaml:
+#   helm upgrade --install atlas-frontend deploy/ \
+#     --namespace atlas-stage \
+#     --values deploy/values-stage.yaml \
+#     --set image.tag=$BITBUCKET_COMMIT
+
+replicaCount: 2
+
+image:
+  pullPolicy: IfNotPresent
+
+runtimeConfig:
+  gatewayUrl: "http://atlas-gateway.atlas-stage.svc.cluster.local:8080"
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: atlas-stage.internal
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: atlas-frontend-tls
+      hosts:
+        - atlas-stage.internal
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+# Stage validates the canary rollout path before prod.
+canary:
+  enabled: true

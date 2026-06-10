@@ -221,15 +221,19 @@ export class ChatStateStore {
     const tick = (): Promise<void> =>
       new Promise<void>((resolve) => {
         const step = () => {
+          // Stop BEFORE updating once the stream has resolved. Otherwise a
+          // dangling frame fires after the done-handler has cleared
+          // streamingContent and re-populates it with the full final content,
+          // leaving a duplicate streaming bubble next to the committed message.
+          if (resolved) {
+            resolve();
+            return;
+          }
           this._state.update((s) => ({
             ...s,
             streamingContent: this.sse.state().content,
           }));
-          if (resolved) {
-            resolve();
-          } else {
-            requestAnimationFrame(step);
-          }
+          requestAnimationFrame(step);
         };
         requestAnimationFrame(step);
       });

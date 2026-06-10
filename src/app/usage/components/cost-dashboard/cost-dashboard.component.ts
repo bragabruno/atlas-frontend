@@ -39,7 +39,7 @@ import type { UsageRow } from '../../services/usage.service';
                   <td>{{ row.model }}</td>
                   <td class="usage-table__num">{{ row.input_tokens | number }}</td>
                   <td class="usage-table__num">{{ row.output_tokens | number }}</td>
-                  <td class="usage-table__num">${{ row.total_cost_usd }}</td>
+                  <td class="usage-table__num">{{ '$' + row.total_cost_usd }}</td>
                 </tr>
               }
             </tbody>

@@ -35,14 +35,14 @@ describe('ConfigService', () => {
     expect(service.config()).toBeNull();
   });
 
-  it('loads config from /assets/config.json and exposes it', async () => {
+  it('loads config from /config.json and exposes it', async () => {
     const mockConfig: RuntimeConfig = {
       gatewayUrl: 'http://test-gateway:8080',
     };
 
     const loadPromise = service.load();
 
-    const req = httpMock.expectOne('/assets/config.json');
+    const req = httpMock.expectOne('/config.json');
     expect(req.request.method).toBe('GET');
     req.flush(mockConfig);
 
@@ -65,7 +65,7 @@ describe('ConfigService', () => {
     };
 
     const loadPromise = service.load();
-    httpMock.expectOne('/assets/config.json').flush(mockConfig);
+    httpMock.expectOne('/config.json').flush(mockConfig);
     await loadPromise;
 
     // Token is present in runtime config, not embedded as a literal in source.

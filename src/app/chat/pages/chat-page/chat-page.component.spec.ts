@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 import { ChatPageComponent } from './chat-page.component';
 import { ChatStateStore } from '../../store/chat-state.store';
 import type { ChatStatus } from '../../store/chat-state.store';
+import { ConfigService } from '../../../core/services/config.service';
 
 // ---------------------------------------------------------------------------
 // Stub factory
@@ -46,9 +47,15 @@ function makeStoreStub(overrides: StubOverrides = {}): Partial<ChatStateStore> {
 // ---------------------------------------------------------------------------
 
 async function configure(stub: Partial<ChatStateStore>) {
+  const configStub: Partial<ConfigService> = {
+    config: signal({ gatewayUrl: 'http://gw', defaultModel: 'mock' }).asReadonly(),
+  };
   await TestBed.configureTestingModule({
     imports: [ChatPageComponent],
-    providers: [{ provide: ChatStateStore, useValue: stub }],
+    providers: [
+      { provide: ChatStateStore, useValue: stub },
+      { provide: ConfigService, useValue: configStub },
+    ],
   }).compileComponents();
 }
 
@@ -99,7 +106,8 @@ describe('ChatPageComponent', () => {
     const composer = fixture.debugElement.query(By.css('atlas-composer'));
     composer.triggerEventHandler('submitted', 'What is REACH?');
 
-    expect(stub.submit).toHaveBeenCalledWith('What is REACH?', 'atlas-rag');
+    // Model comes from runtime config (stub sets defaultModel: 'mock').
+    expect(stub.submit).toHaveBeenCalledWith('What is REACH?', 'mock');
   });
 
   it('shows error banner when status is error', async () => {
