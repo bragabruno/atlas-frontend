@@ -42,55 +42,65 @@ import { FormsModule } from '@angular/forms';
   styles: `
     .composer {
       display: flex;
-      gap: 0.5rem;
-      padding: 1rem;
-      border-top: 1px solid #dee2e6;
-      background: #fff;
+      gap: 0.6rem;
+      padding: 1rem 1.5rem 1.5rem;
+      border-top: 1px solid var(--line-2);
+      background: linear-gradient(180deg, transparent, var(--ink-850) 60%);
     }
 
     .composer__input {
       flex: 1;
       resize: none;
-      border: 1px solid #ced4da;
-      border-radius: 0.375rem;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.9375rem;
-      font-family: inherit;
+      color: var(--bone);
+      background: var(--ink-750);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-md);
+      padding: 0.75rem 0.9rem;
+      font-size: 0.95rem;
+      font-family: var(--font-sans);
       line-height: 1.5;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+      &::placeholder { color: var(--bone-faint); }
 
       &:focus {
-        border-color: #0d6efd;
+        border-color: var(--gilt-deep);
+        box-shadow: 0 0 0 3px var(--gilt-wash);
       }
 
       &:disabled {
-        background: #f8f9fa;
+        opacity: 0.55;
         cursor: not-allowed;
       }
     }
 
     .composer__submit {
-      align-self: flex-end;
-      padding: 0.5rem 1.25rem;
-      background: #0d6efd;
-      color: #fff;
+      align-self: stretch;
+      min-width: 7.5rem;
+      padding: 0 1.4rem;
+      background: linear-gradient(180deg, var(--gilt), var(--gilt-deep));
+      color: var(--ink-900);
       border: none;
-      border-radius: 0.375rem;
-      font-size: 0.9375rem;
+      border-radius: var(--r-md);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      justify-content: center;
+      gap: 0.45rem;
       white-space: nowrap;
-      transition: background 0.15s;
+      transition: filter 0.15s ease, transform 0.1s ease;
 
-      &:hover:not(:disabled) {
-        background: #0b5ed7;
-      }
+      &:hover:not(:disabled) { filter: brightness(1.08); }
+      &:active:not(:disabled) { transform: translateY(1px); }
 
       &:disabled {
-        background: #6c757d;
+        background: var(--ink-700);
+        color: var(--bone-faint);
         cursor: not-allowed;
       }
     }
@@ -99,14 +109,10 @@ import { FormsModule } from '@angular/forms';
       display: inline-block;
       width: 0.85rem;
       height: 0.85rem;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      border-top-color: #fff;
+      border: 2px solid rgba(20, 17, 13, 0.3);
+      border-top-color: var(--ink-900);
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+      animation: atlas-spin 0.7s linear infinite;
     }
   `,
 })

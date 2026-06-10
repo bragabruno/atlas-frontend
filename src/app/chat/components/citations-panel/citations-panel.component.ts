@@ -23,14 +23,17 @@ import type { Citation } from '../../../shared/models';
         <ul class="citations-panel__list">
           @for (cite of citations(); track cite.sourceId) {
             <li class="citation">
-              <span class="citation__id">{{ cite.sourceId }}</span>
-              <strong class="citation__title">{{ cite.title }}</strong>
-              @if (cite.excerpt) {
-                <p class="citation__excerpt">{{ cite.excerpt }}</p>
-              }
-              @if (cite.location) {
-                <span class="citation__location">{{ cite.location }}</span>
-              }
+              <span class="citation__index" aria-hidden="true">{{ $index + 1 }}</span>
+              <div class="citation__body">
+                <span class="citation__id">{{ cite.sourceId }}</span>
+                <strong class="citation__title">{{ cite.title }}</strong>
+                @if (cite.excerpt) {
+                  <p class="citation__excerpt">{{ cite.excerpt }}</p>
+                }
+                @if (cite.location) {
+                  <span class="citation__location">{{ cite.location }}</span>
+                }
+              </div>
             </li>
           }
         </ul>
@@ -39,25 +42,31 @@ import type { Citation } from '../../../shared/models';
   `,
   styles: `
     .citations-panel {
-      width: 260px;
-      min-width: 200px;
-      border-left: 1px solid #dee2e6;
-      padding: 1rem;
+      width: 300px;
+      min-width: 240px;
+      flex: none;
+      border-left: 1px solid var(--line-2);
+      padding: 1.5rem 1.25rem;
       overflow-y: auto;
-      background: #fafafa;
+      background: var(--ink-850);
     }
 
     .citations-panel__title {
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: #6c757d;
-      margin: 0 0 0.75rem;
+      color: var(--gilt);
+      margin: 0 0 1.1rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid var(--line);
     }
 
     .citations-panel__empty {
-      font-size: 0.875rem;
-      color: #adb5bd;
+      font-family: var(--font-sans);
+      font-size: 0.84rem;
+      font-style: italic;
+      color: var(--bone-faint);
     }
 
     .citations-panel__list {
@@ -66,37 +75,74 @@ import type { Citation } from '../../../shared/models';
       padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.85rem;
     }
 
     .citation {
       display: flex;
+      gap: 0.7rem;
+      padding: 0.7rem 0.8rem;
+      background: var(--ink-800);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      animation: atlas-rise 0.3s ease both;
+    }
+    .citation:hover {
+      transform: translateY(-2px);
+      border-color: var(--gilt-wash-2);
+      box-shadow: 0 12px 26px -18px rgba(0, 0, 0, 0.85);
+    }
+
+    .citation__index {
+      flex: none;
+      width: 1.5rem;
+      height: 1.5rem;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--gilt-bright);
+      background: var(--gilt-wash);
+      border: 1px solid var(--gilt-wash-2);
+      border-radius: 50%;
+    }
+
+    .citation__body {
+      display: flex;
       flex-direction: column;
       gap: 0.2rem;
-      font-size: 0.8125rem;
-      border-left: 3px solid #0d6efd;
-      padding-left: 0.5rem;
+      min-width: 0;
     }
 
     .citation__id {
-      font-size: 0.7rem;
-      color: #adb5bd;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.04em;
+      color: var(--bone-faint);
     }
 
     .citation__title {
-      font-weight: 600;
-      color: #212529;
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--bone);
+      word-break: break-word;
     }
 
     .citation__excerpt {
-      margin: 0;
-      color: #495057;
+      margin: 0.15rem 0 0;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      line-height: 1.45;
       font-style: italic;
+      color: var(--bone-mute);
     }
 
     .citation__location {
-      color: #6c757d;
-      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--bone-faint);
     }
   `,
 })

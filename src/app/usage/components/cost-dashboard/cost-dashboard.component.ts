@@ -10,7 +10,10 @@ import type { UsageRow } from '../../services/usage.service';
   imports: [DecimalPipe],
   template: `
     <section class="cost-dashboard">
-      <h1 class="cost-dashboard__title">Usage &amp; Cost</h1>
+      <header class="cost-dashboard__head">
+        <span class="cost-dashboard__eyebrow">Ledger</span>
+        <h1 class="cost-dashboard__title">Usage &amp; Cost</h1>
+      </header>
 
       @if (loading()) {
         <p class="cost-dashboard__loading">Loading usage data…</p>
@@ -49,59 +52,97 @@ import type { UsageRow } from '../../services/usage.service';
     </section>
   `,
   styles: `
+    :host { display: block; height: 100%; overflow-y: auto; }
+
     .cost-dashboard {
-      padding: 1.5rem;
-      max-width: 900px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.5rem 1.75rem 3rem;
+      animation: atlas-rise 0.4s ease both;
     }
 
+    .cost-dashboard__head {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.1rem;
+      border-bottom: 1px solid var(--line-2);
+    }
+    .cost-dashboard__eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gilt);
+    }
     .cost-dashboard__title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0 0 0.5rem;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--bone);
+      margin: 0.35rem 0 0;
     }
 
     .cost-dashboard__since {
-      font-size: 0.875rem;
-      color: #6c757d;
-      margin: 0 0 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: var(--bone-mute);
+      margin: 0 0 1.4rem;
     }
 
     .cost-dashboard__loading,
     .cost-dashboard__empty {
-      color: #6c757d;
-      font-size: 0.875rem;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--bone-mute);
+      padding: 2rem 0;
     }
 
     .cost-dashboard__error {
-      color: #842029;
-      background: #f8d7da;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      font-size: 0.875rem;
+      color: #efc7bd;
+      background: var(--oxblood-bg);
+      border: 1px solid rgba(168, 65, 47, 0.4);
+      border-left: 3px solid var(--oxblood);
+      padding: 0.7rem 0.9rem;
+      border-radius: var(--r-md);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
     }
 
     .usage-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-
-    .usage-table th,
-    .usage-table td {
-      padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid #dee2e6;
-      text-align: left;
     }
 
     .usage-table th {
-      font-weight: 600;
-      background: #f8f9fa;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--bone-mute);
+      text-align: left;
+      padding: 0 0.9rem 0.7rem;
+      border-bottom: 1px solid var(--line-2);
     }
+
+    .usage-table td {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      color: var(--bone);
+      padding: 0.85rem 0.9rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .usage-table tbody tr { transition: background 0.15s ease; }
+    .usage-table tbody tr:hover { background: var(--gilt-wash); }
 
     .usage-table__num {
       text-align: right;
+      font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
     }
+    td.usage-table__num { color: var(--gilt-bright); }
   `,
 })
 export class CostDashboardComponent implements OnInit {

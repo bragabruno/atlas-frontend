@@ -66,6 +66,8 @@ const FALLBACK_MODEL = 'atlas-rag';
     </div>
   `,
   styles: `
+    :host { display: block; height: 100%; }
+
     .chat-layout {
       display: flex;
       height: 100%;
@@ -76,37 +78,62 @@ const FALLBACK_MODEL = 'atlas-rag';
       display: flex;
       flex-direction: column;
       flex: 1;
+      min-width: 0;
       overflow: hidden;
+      background:
+        radial-gradient(80% 50% at 50% 0%, rgba(201, 163, 91, 0.05), transparent 70%);
     }
 
     .banner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
+      gap: 1rem;
+      margin: 0 1.25rem 0.85rem;
+      padding: 0.7rem 0.9rem;
+      font-family: var(--font-sans);
+      font-size: 0.84rem;
+      border-radius: var(--r-md);
+      border: 1px solid var(--line-2);
+      animation: atlas-rise 0.3s ease both;
     }
 
     .banner--error {
-      background: #f8d7da;
-      color: #842029;
-      border-top: 1px solid #f5c2c7;
+      background: var(--oxblood-bg);
+      color: #efc7bd;
+      border-color: rgba(168, 65, 47, 0.45);
+      border-left: 3px solid var(--oxblood);
     }
 
     .banner--warning {
-      background: #fff3cd;
-      color: #664d03;
-      border-top: 1px solid #ffecb5;
+      background: var(--amber-bg);
+      color: #ecd2a3;
+      border-color: rgba(207, 154, 69, 0.45);
+      border-left: 3px solid var(--amber);
     }
 
     .banner__dismiss {
+      flex: none;
       background: none;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      padding: 0 0.25rem;
+      border: 1px solid var(--line-2);
       color: inherit;
-      text-decoration: underline;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--r-sm);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .banner__dismiss:hover {
+      background: rgba(242, 234, 219, 0.06);
+      border-color: var(--line-3);
+    }
+
+    @media (max-width: 860px) {
+      .chat-layout { flex-direction: column; }
     }
   `,
 })

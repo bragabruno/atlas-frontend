@@ -1,1 +1,140 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================================
+   Atlas — "Ledger" design system
+   Ink & gilt regulatory archive. Dark warm ink, parchment text, a single gilt
+   accent, oxblood for blocked states. Display serif (Fraunces), UI sans
+   (Archivo), mono (JetBrains Mono).
+   ========================================================================== */
+
+:root {
+  /* — Ink (warm near-blacks) — */
+  --ink-900: #14110d; /* page */
+  --ink-850: #181410;
+  --ink-800: #1c1813; /* base surface */
+  --ink-750: #231e17; /* card */
+  --ink-700: #2b251c; /* raised / hover */
+  --ink-650: #352d22;
+
+  /* — Bone (parchment text) — */
+  --bone:      #f2eadb;
+  --bone-dim:  #ccc0a8;
+  --bone-mute: #8f836b;
+  --bone-faint:#6a6253;
+
+  /* — Gilt / brass accent — */
+  --gilt:        #c9a35b;
+  --gilt-bright: #e7cd90;
+  --gilt-deep:   #9c7d3f;
+  --gilt-wash:   rgba(201, 163, 91, 0.10);
+  --gilt-wash-2: rgba(201, 163, 91, 0.18);
+
+  /* — Semantic — */
+  --oxblood:   #a8412f; /* blocked / error */
+  --oxblood-bg: rgba(168, 65, 47, 0.12);
+  --amber:     #cf9a45; /* rate-limited / warn */
+  --amber-bg:  rgba(207, 154, 69, 0.12);
+  --verdigris: #6fa085; /* ok / verified */
+
+  /* — Hairlines — */
+  --line:   rgba(231, 213, 176, 0.10);
+  --line-2: rgba(231, 213, 176, 0.18);
+  --line-3: rgba(231, 213, 176, 0.28);
+
+  /* — Type — */
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Archivo", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* — Radii / shadow — */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 14px;
+  --shadow-card: 0 1px 0 rgba(231, 213, 176, 0.04) inset,
+    0 18px 40px -24px rgba(0, 0, 0, 0.7);
+  --shadow-pop: 0 24px 60px -28px rgba(0, 0, 0, 0.85);
+
+  --header-h: 64px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--bone);
+  background-color: var(--ink-900);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "cv01";
+
+  /* Atmosphere: warm vignette + faint gilt aurora, over a fine grain. */
+  background-image:
+    radial-gradient(120% 80% at 12% -8%, rgba(201, 163, 91, 0.10), transparent 55%),
+    radial-gradient(90% 70% at 100% 0%, rgba(168, 65, 47, 0.06), transparent 50%),
+    radial-gradient(140% 120% at 50% 120%, rgba(0, 0, 0, 0.55), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Fine grain overlay (data-URI noise), multiply-blended for tooth. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+atlas-root { position: relative; z-index: 1; display: block; min-height: 100%; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--gilt-wash-2); color: var(--gilt-bright); }
+
+/* Scrollbars — thin, gilt-on-ink. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-650) transparent;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: var(--ink-650);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--gilt-deep); background-clip: content-box; }
+
+/* — Shared motion — */
+@keyframes atlas-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes atlas-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes atlas-blink {
+  0%, 45% { opacity: 1; }
+  50%, 95% { opacity: 0.15; }
+  100% { opacity: 1; }
+}
+@keyframes atlas-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
