@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { vi } from 'vitest';
 
 import { UsageService } from './usage.service';
 import { ConfigService } from '../../core/services/config.service';
