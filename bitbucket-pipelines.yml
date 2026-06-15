@@ -1,0 +1,68 @@
+# Bitbucket Pipelines — atlas-frontend (INF-2 Gate 1, XCUT-6).
+#
+# Orchestration only: every gate calls a versioned script under scripts/ (the
+# single source of truth). Run `make ci` locally for the same gates plus the
+# docker/infra stages (which need helm + a docker daemon not present in this CI
+# image). Logic lives in scripts/, not in this file. See atlas-docs/07-build-system.md.
+#
+# Gate 1 (scripts/lint.sh): Trunk(eslint + prettier) + tsc --noEmit. eslint +
+#   prettier use the repo's pinned configs (eslint.config.js, .prettierrc).
+# Gate 1 (scripts/test.sh): vitest run-once (ng test --watch=false; zero spend).
+# XCUT-6  (scripts/validate_diagrams.sh): Mermaid + PlantUML diagram validation.
+#
+# Lockfile (package-lock.json) is already committed (XCUT-4); `npm ci` installs
+# from it exactly. Image pinned to the toolchain's Node major (Node 22). No
+# secret values in this file.
+
+image: node:22.22.2-bookworm-slim # 22.22.2 (2026-03-24)
+
+definitions:
+  caches:
+    npm-cache: ~/.npm
+    trunk-cache: ~/.cache/trunk
+
+  steps:
+    - step: &lint
+        name: 'Gate 1 — Lint & Typecheck (scripts/lint.sh)'
+        caches: [npm-cache, trunk-cache]
+        script:
+          # Env prep only; all validation logic is in scripts/lint.sh. Trunk is
+          # git-native and fetches its tools at runtime, so the slim image needs
+          # git + curl. npm ci provides tsc for the typecheck step.
+          - apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates
+          - npm ci
+          - curl -fsSL https://get.trunk.io | bash -s -- -y
+          - export PATH="$HOME/.cache/trunk/bin:$PATH"
+          - ./scripts/lint.sh
+
+    - step: &unit-tests
+        name: 'Gate 1 — Unit Tests (scripts/test.sh)'
+        caches: [npm-cache]
+        script:
+          - npm ci
+          # Vitest run-once (ng test --watch=false), zero API spend.
+          - CHROME_BIN=/usr/bin/chromium ./scripts/test.sh
+        artifacts:
+          - coverage/**
+
+    - step: &diagram-validation
+        name: 'XCUT-6 — Diagram validation (scripts/validate_diagrams.sh)'
+        script:
+          - apt-get update && apt-get install -y --no-install-recommends
+            default-jre-headless chromium fonts-liberation
+          - export PLANTUML_VERSION=1.2026.3
+          - curl -fsSL -o /tmp/plantuml.jar
+            "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar"
+          - export PLANTUML_JAR=/tmp/plantuml.jar
+          - export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+          - printf '{"args":["--no-sandbox"]}' > /tmp/puppeteer.json
+          - export PUPPETEER_CONFIG=/tmp/puppeteer.json
+          - ./scripts/validate_diagrams.sh docs/diagrams
+
+pipelines:
+  pull-requests:
+    '**':
+      - parallel:
+          - step: *lint
+          - step: *unit-tests
+          - step: *diagram-validation

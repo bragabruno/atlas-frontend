@@ -3,9 +3,9 @@ import { By } from '@angular/platform-browser';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
-import { CostDashboardComponent } from './cost-dashboard.component';
-import { UsageService } from '../../services/usage.service';
-import type { UsageResponse } from '../../services/usage.service';
+import { CostDashboardComponent } from './cost-dashboard';
+import { UsageService } from '../../services/usage';
+import type { UsageResponse } from '../../services/usage';
 
 function configure(usageStub: Partial<UsageService>) {
   TestBed.configureTestingModule({

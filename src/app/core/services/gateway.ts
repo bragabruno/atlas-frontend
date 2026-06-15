@@ -2,16 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ConfigService } from './config.service';
+import { ConfigService } from './config';
 import type { components } from '../api/gateway-types';
-import type {
-  ChatCompletionResponse,
-  ChatCompletionChunk,
-} from '../api/gateway-openai-types';
+import type { ChatCompletionResponse, ChatCompletionChunk } from '../api/gateway-openai-types';
 
 /** Request body sent to POST /v1/chat/completions. */
-export type ChatCompletionRequest =
-  components['schemas']['ChatCompletionRequest'];
+export type ChatCompletionRequest = components['schemas']['ChatCompletionRequest'];
 
 /** Re-export for consumers that only import from this service. */
 export type { ChatCompletionResponse, ChatCompletionChunk };
@@ -37,9 +33,7 @@ export class GatewayService {
    *               `stream` should be false (or omitted) for non-streaming mode.
    * @returns Observable that emits the single ChatCompletionResponse.
    */
-  chatCompletion(
-    body: ChatCompletionRequest,
-  ): Observable<ChatCompletionResponse> {
+  chatCompletion(body: ChatCompletionRequest): Observable<ChatCompletionResponse> {
     const url = `${this.config.gatewayUrl}/v1/chat/completions`;
     return this.http.post<ChatCompletionResponse>(url, body);
   }

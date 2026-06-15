@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
-import { UsageService } from '../../services/usage.service';
-import type { UsageRow } from '../../services/usage.service';
+import { UsageService } from '../../services/usage';
+import type { UsageRow } from '../../services/usage';
 
 @Component({
   selector: 'atlas-cost-dashboard',

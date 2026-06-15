@@ -7,7 +7,7 @@ type: application
 version: 0.1.0
 
 # Application version — the Angular SPA version; independent of chart version.
-appVersion: "0.1.0"
+appVersion: '0.1.0'
 
 # Argo Rollouts is a cluster-level operator; no chart dependency needed here.
 # The Rollout CRD (argoproj.io/v1alpha1) must be installed by atlas-infra

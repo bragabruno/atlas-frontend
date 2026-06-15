@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
 
-import { ConfigService } from '../services/config.service';
+import { ConfigService } from '../services/config';
 
 /**
  * Functional HTTP interceptor that attaches `Authorization: Bearer <token>` to

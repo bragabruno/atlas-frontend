@@ -4,14 +4,12 @@ export const routes: Routes = [
   {
     path: 'chat',
     loadComponent: () =>
-      import('./chat/pages/chat-page/chat-page.component').then(
-        (m) => m.ChatPageComponent,
-      ),
+      import('./chat/pages/chat-page/chat-page').then((m) => m.ChatPageComponent),
   },
   {
     path: 'usage',
     loadComponent: () =>
-      import('./usage/components/cost-dashboard/cost-dashboard.component').then(
+      import('./usage/components/cost-dashboard/cost-dashboard').then(
         (m) => m.CostDashboardComponent,
       ),
   },

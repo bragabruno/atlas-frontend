@@ -1,14 +1,11 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  provideHttpClientTesting,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 
-import { ConfigService, RuntimeConfig } from './config.service';
-import { GatewayService } from './gateway.service';
-import type { ChatCompletionRequest, ChatCompletionResponse } from './gateway.service';
+import { ConfigService, RuntimeConfig } from './config';
+import { GatewayService } from './gateway';
+import type { ChatCompletionRequest, ChatCompletionResponse } from './gateway';
 
 const GATEWAY_URL = 'http://test-gateway:8080';
 
@@ -86,11 +83,13 @@ describe('GatewayService', () => {
     };
 
     const result = new Promise<ChatCompletionResponse>((resolve) => {
-      service.chatCompletion({
-        model: 'atlas-rag',
-        messages: [{ role: 'user', content: 'REACH?' }],
-        stream: false,
-      }).subscribe((response) => resolve(response));
+      service
+        .chatCompletion({
+          model: 'atlas-rag',
+          messages: [{ role: 'user', content: 'REACH?' }],
+          stream: false,
+        })
+        .subscribe((response) => resolve(response));
     });
 
     httpMock.expectOne(`${GATEWAY_URL}/v1/chat/completions`).flush(mockResponse);
@@ -99,11 +98,13 @@ describe('GatewayService', () => {
   });
 
   it('constructs the URL from ConfigService.gatewayUrl', () => {
-    service.chatCompletion({
-      model: 'atlas-rag',
-      messages: [{ role: 'user', content: 'Hello' }],
-      stream: false,
-    }).subscribe();
+    service
+      .chatCompletion({
+        model: 'atlas-rag',
+        messages: [{ role: 'user', content: 'Hello' }],
+        stream: false,
+      })
+      .subscribe();
 
     const req = httpMock.expectOne(`${GATEWAY_URL}/v1/chat/completions`);
     expect(req.request.url).toBe(`${GATEWAY_URL}/v1/chat/completions`);

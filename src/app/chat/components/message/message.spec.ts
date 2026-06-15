@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { MessageComponent } from './message.component';
+import { MessageComponent } from './message';
 import type { Message } from '../../../shared/models';
 
 function makeMsg(overrides: Partial<Message> = {}): Message {

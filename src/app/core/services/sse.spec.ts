@@ -2,8 +2,8 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import { ConfigService, RuntimeConfig } from './config.service';
-import { SseService, TooManyRequestsError } from './sse.service';
+import { ConfigService, RuntimeConfig } from './config';
+import { SseService, TooManyRequestsError } from './sse';
 import type { ChatCompletionChunk } from '../api/gateway-openai-types';
 
 const GATEWAY_URL = 'http://test-gateway:8080';
@@ -199,9 +199,7 @@ describe('SseService', () => {
     });
 
     const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
-    expect((init.headers as Record<string, string>)['Authorization']).toBe(
-      'Bearer bearer-test',
-    );
+    expect((init.headers as Record<string, string>)['Authorization']).toBe('Bearer bearer-test');
   });
 
   it('forces stream: true in the request body', async () => {

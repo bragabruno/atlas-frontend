@@ -2,19 +2,20 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import { SseService, TooManyRequestsError } from '../../core/services/sse.service';
-import { parseCitations } from './chat-state.store';
-import type { StreamState } from '../../core/services/sse.service';
-import { ChatStateStore } from './chat-state.store';
+import { SseService, TooManyRequestsError } from '../../core/services/sse';
+import type { StreamState } from '../../core/services/sse';
+import { ChatStateStore, parseCitations } from './chat-state-store';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeSseStub(overrides: Partial<{
-  streamFn: (body: unknown) => Promise<void>;
-  initialContent: string;
-}> = {}): {
+function makeSseStub(
+  overrides: Partial<{
+    streamFn: (body: unknown) => Promise<void>;
+    initialContent: string;
+  }> = {},
+): {
   service: Pick<SseService, 'state' | 'stream' | 'reset'>;
   stateSignal: ReturnType<typeof signal<StreamState>>;
 } {
@@ -34,14 +35,9 @@ function makeSseStub(overrides: Partial<{
   return { service, stateSignal };
 }
 
-function provideStore(
-  sseSvc: Pick<SseService, 'state' | 'stream' | 'reset'>,
-): ChatStateStore {
+function provideStore(sseSvc: Pick<SseService, 'state' | 'stream' | 'reset'>): ChatStateStore {
   TestBed.configureTestingModule({
-    providers: [
-      ChatStateStore,
-      { provide: SseService, useValue: sseSvc },
-    ],
+    providers: [ChatStateStore, { provide: SseService, useValue: sseSvc }],
   });
   return TestBed.inject(ChatStateStore);
 }

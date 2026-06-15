@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 
-import { ConfigService } from '../../../core/services/config.service';
-import { ChatStateStore } from '../../store/chat-state.store';
-import { MessageListComponent } from '../../components/message-list/message-list.component';
-import { ComposerComponent } from '../../components/composer/composer.component';
-import { CitationsPanelComponent } from '../../components/citations-panel/citations-panel.component';
+import { ConfigService } from '../../../core/services/config';
+import { ChatStateStore } from '../../store/chat-state-store';
+import { MessageListComponent } from '../../components/message-list/message-list';
+import { ComposerComponent } from '../../components/composer/composer';
+import { CitationsPanelComponent } from '../../components/citations-panel/citations-panel';
 
 /** Fallback model when runtime config does not specify `defaultModel`. */
 const FALLBACK_MODEL = 'atlas-rag';
@@ -56,10 +56,7 @@ const FALLBACK_MODEL = 'atlas-rag';
         }
         <!-- ---------------------------------------------------------------- -->
 
-        <atlas-composer
-          [disabled]="store.isBusy()"
-          (submitted)="onSubmit($event)"
-        />
+        <atlas-composer [disabled]="store.isBusy()" (submitted)="onSubmit($event)" />
       </main>
 
       <atlas-citations-panel [citations]="store.citations()" />

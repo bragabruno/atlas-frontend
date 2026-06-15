@@ -7,7 +7,7 @@ image:
   repository: acr.azurecr.io/atlas/frontend
   # tag is intentionally empty; set at deploy time with the git SHA:
   #   helm upgrade --set image.tag=$BITBUCKET_COMMIT
-  tag: ""
+  tag: ''
   pullPolicy: IfNotPresent
 
 # ─── Replica count ────────────────────────────────────────────────────────────
@@ -19,7 +19,7 @@ replicaCount: 2
 # picks it up at /assets/config.json (the path it fetches at app init).
 # Populate gatewayUrl per environment; bearerToken is optional (BFF path).
 runtimeConfig:
-  gatewayUrl: "https://gateway.atlas.internal"
+  gatewayUrl: 'https://gateway.atlas.internal'
   # bearerToken: ""   # do not set a real token here; inject via CI set-value
 
 # ─── Service ──────────────────────────────────────────────────────────────────
@@ -32,9 +32,9 @@ service:
 # ─── Ingress ──────────────────────────────────────────────────────────────────
 ingress:
   enabled: true
-  className: "nginx"
+  className: 'nginx'
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
   hosts:
     - host: atlas.internal
       paths:
@@ -48,11 +48,11 @@ ingress:
 # ─── Resources ────────────────────────────────────────────────────────────────
 resources:
   requests:
-    cpu: "50m"
-    memory: "64Mi"
+    cpu: '50m'
+    memory: '64Mi'
   limits:
-    cpu: "200m"
-    memory: "128Mi"
+    cpu: '200m'
+    memory: '128Mi'
 
 # ─── Probes ───────────────────────────────────────────────────────────────────
 # Both probes hit the lightweight /health endpoint in nginx.conf.
@@ -91,17 +91,17 @@ canary:
 serviceAccount:
   create: true
   annotations: {}
-  name: ""
+  name: ''
 
 # ─── Pod annotations ──────────────────────────────────────────────────────────
 podAnnotations:
   # Signals to the OTel Collector DaemonSet that this pod emits no spans.
   # Remove if OpenTelemetry RUM instrumentation is added later.
-  instrumentation.opentelemetry.io/inject-nodejs: "false"
+  instrumentation.opentelemetry.io/inject-nodejs: 'false'
 
 # ─── Security context ─────────────────────────────────────────────────────────
 podSecurityContext:
-  runAsNonRoot: false   # nginx master process must bind port; see note below
+  runAsNonRoot: false # nginx master process must bind port; see note below
   # Note: nginx:alpine runs the master as root and worker processes as `nginx`
   # (uid 101). AKS policy allows this for port-binding purposes; the worker
   # processes drop to uid 101.  If a distroless or rootless nginx image is
@@ -109,7 +109,7 @@ podSecurityContext:
 
 containerSecurityContext:
   allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: false   # nginx writes tmp files; set true only with tmpfs mounts
+  readOnlyRootFilesystem: false # nginx writes tmp files; set true only with tmpfs mounts
   capabilities:
     drop:
       - ALL

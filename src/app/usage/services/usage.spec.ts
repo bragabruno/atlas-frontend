@@ -2,8 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 
-import { UsageService } from './usage.service';
-import { ConfigService } from '../../core/services/config.service';
+import { UsageService } from './usage';
+import { ConfigService } from '../../core/services/config';
 
 function provideService(): { service: UsageService; http: HttpTestingController } {
   const configStub = { gatewayUrl: 'http://gw' } as ConfigService;

@@ -26,11 +26,13 @@ coverage/
 docs/
 *.md
 
-# Deployment Helm chart — not part of the application image.
-# Exclude the chart files but KEEP deploy/nginx/ — the runtime stage copies
-# deploy/nginx/nginx.conf into the image (excluding all of deploy/ broke the build).
+# Deployment chart — not part of the application image.
+# Exception: the Dockerfile copies deploy/nginx/nginx.conf into the runtime
+# stage, so that one file must remain in the build context.
 deploy/*
 !deploy/nginx
+deploy/nginx/*
+!deploy/nginx/nginx.conf
 
 # Environment files — secrets must never enter the image
 .env
